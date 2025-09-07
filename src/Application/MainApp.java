@@ -1,5 +1,7 @@
 package Application;
 import db.DB;
+import db.DbIntegratException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,29 +19,26 @@ public class MainApp {
         Connection conn = null;
         PreparedStatement ps = null;
 
-        System.out.print("Update your Base Salary: ");
-        baseSalary = sc.nextDouble();
-        System.out.print("Type your departmentId (from 1 to 4): ");
+        System.out.print("Enter which ID you want to delete: ");
         departmentId = sc.nextInt();
 
         try{
             conn = DB.getConn();
 
             ps = conn.prepareStatement(
-                    "UPDATE seller "
-                            + "SET BaseSalary = BaseSalary + ? "
+                    "DELETE FROM seller "
                             + "WHERE "
-                            + "(DepartmentId = ?)");
+                            + "(ID = ?)");
 
-            ps.setDouble(1, baseSalary);
-            ps.setInt(2, departmentId);
+            ps.setInt(1, departmentId);
+
             int rows = ps.executeUpdate();
             System.out.println("Done!");
             System.out.println("Total Rows Affected: " + rows);
 
         }
         catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DbIntegratException(e.getMessage());
         }
         finally {
             DB.closeStatment(ps);
