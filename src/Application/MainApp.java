@@ -1,44 +1,42 @@
 package Application;
 import db.DB;
-import db.DbIntegratException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.util.Scanner;
 
 
 public class MainApp {
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, SQLException {
 
         Scanner sc = new Scanner(System.in);
-        double baseSalary;
-        int departmentId;
-
         Connection conn = null;
-        PreparedStatement ps = null;
+        Statement ps = null;
 
-        System.out.print("Enter which ID you want to delete: ");
-        departmentId = sc.nextInt();
 
         try{
             conn = DB.getConn();
 
-            ps = conn.prepareStatement(
-                    "DELETE FROM seller "
-                            + "WHERE "
-                            + "(ID = ?)");
+            conn.setAutoCommit(false);
 
-            ps.setInt(1, departmentId);
+            ps = conn.createStatement();
 
-            int rows = ps.executeUpdate();
-            System.out.println("Done!");
-            System.out.println("Total Rows Affected: " + rows);
+            int oneRow = ps.executeUpdate("UPDATE seller set BaseSalary = 3090 WHERE DepartmentId = 2");
+
+            int twoRow = ps.executeUpdate("UPDATE seller set BaseSalary = 5090 WHERE DepartmentId = 1");
+
+            conn.commit();
+
+            System.out.println("rows1" + oneRow);
+            System.out.println("rows2" + twoRow);
+
 
         }
         catch (SQLException e) {
-            throw new DbIntegratException(e.getMessage());
+            conn.rollback();
         }
         finally {
             DB.closeStatment(ps);
