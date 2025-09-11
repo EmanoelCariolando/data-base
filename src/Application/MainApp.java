@@ -1,5 +1,8 @@
 package Application;
 import db.DB;
+import entities.Department;
+import model.dao.DaoFactory;
+import model.dao.SellerDao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,34 +16,11 @@ public class MainApp {
     public static void main(String[] args) throws ParseException, SQLException {
 
         Scanner sc = new Scanner(System.in);
-        Connection conn = null;
-        Statement ps = null;
 
+        Department dpOne = new Department(1,"Books");
 
-        try{
-            conn = DB.getConn();
-
-            conn.setAutoCommit(false);
-
-            ps = conn.createStatement();
-
-            int oneRow = ps.executeUpdate("UPDATE seller set BaseSalary = 3090 WHERE DepartmentId = 2");
-
-            int twoRow = ps.executeUpdate("UPDATE seller set BaseSalary = 5090 WHERE DepartmentId = 1");
-
-            conn.commit();
-
-            System.out.println("rows1" + oneRow);
-            System.out.println("rows2" + twoRow);
-
-
-        }
-        catch (SQLException e) {
-            conn.rollback();
-        }
-        finally {
-            DB.closeStatment(ps);
-        }
+        SellerDao sellerDao = DaoFactory.createSellerDao();
+        System.out.println(dpOne);
 
     }
 }
