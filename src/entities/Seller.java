@@ -13,6 +13,8 @@ public class Seller implements Serializable {
 
     private Department department;
 
+    public Seller(){
+    }
     public Seller(Double baseSalary, Date birthDate, String email, Integer id, String name) {
         this.baseSalary = baseSalary;
         this.birthDate = birthDate;
