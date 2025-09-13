@@ -1,5 +1,4 @@
 package model.dao.impl;
-
 import db.DB;
 import entities.Department;
 import entities.Seller;
@@ -16,6 +15,24 @@ public class SellerDaoJDBC implements SellerDao {
     private Connection conn;
     public SellerDaoJDBC(Connection cone){
         this.conn = cone;
+    }
+
+    //METHODS
+    public Department functionDep(ResultSet rs) throws SQLException {
+        Department dp = new Department();
+        dp.setId(rs.getInt("DepartmentId"));
+        dp.setName(rs.getString("DepName"));
+        return dp;
+    }
+    public Seller functiorSeller(ResultSet rs, Department dp) throws SQLException {
+        Seller sl = new Seller();
+        sl.setId(rs.getInt("Id"));
+        sl.setName(rs.getString("Name"));
+        sl.setEmail(rs.getString("Email"));
+        sl.setBirthDate(rs.getDate("BirthDate"));
+        sl.setBaseSalary(rs.getDouble("BaseSalary"));
+        sl.setDepartment(dp);
+        return sl;
     }
 
     @Override
@@ -46,21 +63,11 @@ public class SellerDaoJDBC implements SellerDao {
                     st.setInt(1, id);
                     rs = st.executeQuery();
                     if (rs.next()){
-                        Department dp = new Department();
-                        dp.setId(rs.getInt("DepartmentId"));
-                        dp.setName(rs.getString("DepName"));
-                        Seller sl = new Seller();
-                        sl.setId(rs.getInt("Id"));
-                        sl.setName(rs.getString("Name"));
-                        sl.setEmail(rs.getString("Email"));
-                        sl.setBirthDate(rs.getDate("BirthDate"));
-                        sl.setBaseSalary(rs.getDouble("BaseSalary"));
-                        sl.setDepartment(dp);
+                        Department dp = functionDep(rs);
+                        Seller sl = functiorSeller(rs,dp);
                         return sl;
                     }
                     return null;
-
-
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

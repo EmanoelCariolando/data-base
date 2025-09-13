@@ -13,7 +13,9 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         SellerDao sellerDao = DaoFactory.createSellerDao();
 
-        Seller seller = sellerDao.findById(12);
+        System.out.print("Search your id: ");
+        int id = sc.nextInt();
+        Seller seller = sellerDao.findById(id);
         System.out.println(seller);
 
     }

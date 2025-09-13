@@ -1,9 +1,5 @@
 package model.dao;
-
-import com.mysql.cj.xdevapi.Client;
 import entities.Department;
-import entities.Seller;
-
 import java.util.List;
 
 public interface DepartmentDao {

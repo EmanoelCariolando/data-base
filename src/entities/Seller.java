@@ -1,5 +1,4 @@
 package entities;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -86,13 +85,12 @@ public class Seller implements Serializable {
 
     @Override
     public String toString() {
-        return "Seller{" +
-                "baseSalary=" + baseSalary +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", birthDate=" + birthDate +
-                ", department=" + department +
-                '}';
+        return "Seller" + ": " +
+                "name = " + name +
+                ", id = " + id +
+                ", baseSalary = " + baseSalary +
+                ", email = " + email +
+                ", birthDate = " + birthDate +
+                ", department = " + department;
     }
 }
