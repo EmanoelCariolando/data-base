@@ -4,10 +4,7 @@ import entities.Department;
 import entities.Seller;
 import model.dao.SellerDao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +42,39 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public void insert(Seller obj) {
+        PreparedStatement ps = null;
+
+        try {
+            ps = conn.prepareStatement(
+                    "INSERT INTO seller "
+                            + "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+                            + "VALUES "
+                            + "(?,?,?,?,?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+
+            ps.setString(1,obj.getName());
+            ps.setString(2,obj.getEmail());
+            ps.setDate(3,new java.sql.Date(obj.getBirthDate().getTime()));
+            ps.setDouble(4,obj.getBaseSalary());
+            ps.setInt(5,obj.getId());
+
+            int rowsAfected = ps.executeUpdate();
+
+            if (rowsAfected > 0){
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()){
+                    int id = rs.getInt(1);
+                    obj.setId(id);
+                    System.out.println("New insert approved!");
+                }
+
+            }
+
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -88,9 +118,7 @@ public class SellerDaoJDBC implements SellerDao {
                     rs = st.executeQuery();
                     if (rs.next()){
                         Department dp = functionDep(rs);
-                        Seller sl;
-                        sl = functiorSeller(rs,dp);
-                        return sl;
+                        return functiorSeller(rs,dp);
                     }
                     return null;
 
@@ -105,7 +133,43 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public List<Seller> findAll() {
-        return List.of();
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.prepareStatement(
+                    "SELECT seller.*,department.Name as DepName "
+                            + "FROM seller INNER JOIN department "
+                            +   "ON seller.DepartmentId = department.Id "
+                            +   "ORDER BY name"
+
+            );
+
+
+            rs = st.executeQuery();
+
+            List<Seller> list = new ArrayList<>();
+            Map<Integer,Department> map = new HashMap<>();
+
+            while (rs.next()){
+                Department department = map.get(rs.getInt("DepartmentId"));
+
+                if (department == null){
+                    department = functionDep(rs);
+                    map.put(rs.getInt("DepartmentId"), department);
+                }
+
+                Seller sl = functiorSeller(rs,department);
+                list.add(sl);
+            }
+            return list;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            DB.closeStatment(st);
+            DB.closeResult(rs);
+        }
     }
 
     @Override
@@ -132,8 +196,8 @@ public class SellerDaoJDBC implements SellerDao {
                 Department department = map.get(rs.getInt("DepartmentId"));
 
                 if (department == null){
-                     dp = functionDep(rs);
-                     map.put(rs.getInt("DepartmentId"), dp);
+                     department = functionDep(rs);
+                     map.put(rs.getInt("DepartmentId"), department);
                 }
 
                 Seller sl = functiorSeller(rs,dp);
