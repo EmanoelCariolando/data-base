@@ -57,7 +57,7 @@ public class SellerDaoJDBC implements SellerDao {
             ps.setString(2,obj.getEmail());
             ps.setDate(3,new java.sql.Date(obj.getBirthDate().getTime()));
             ps.setDouble(4,obj.getBaseSalary());
-            ps.setInt(5,obj.getId());
+            ps.setInt(5,obj.getDepartment().getId());
 
             int rowsAfected = ps.executeUpdate();
 
@@ -81,21 +81,32 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public void update(Seller obj) {
         PreparedStatement ps = null;
-        ResultSet rs = null;
+
         try {
             ps = conn.prepareStatement(
                     "UPDATE seller "
-                    + "SET BaseSalary = BaseSalary + ? "
-                    + "WHERE "
-                    + "(DepartmentId = ?)"
-            );
-            ps.setInt(1, obj.getId());
-            int rows = ps.executeUpdate();
-            System.out.println("Done! Rows Affected: " + rows);
+                            + "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
+                            + "WHERE Id = ?"
 
-        } catch (SQLException e) {
+            );
+
+            ps.setString(1,obj.getName());
+            ps.setString(2,obj.getEmail());
+            ps.setDate(3,new java.sql.Date(obj.getBirthDate().getTime()));
+            ps.setDouble(4,obj.getBaseSalary());
+            ps.setInt(5,obj.getDepartment().getId());
+            ps.setInt(6,obj.getId());
+            ps.executeUpdate();
+
+            String nameObj = obj.getName();
+
+            System.out.println("your " + obj + ", its update!");
+
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
 
 
