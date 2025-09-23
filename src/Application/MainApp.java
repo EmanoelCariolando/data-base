@@ -24,6 +24,7 @@ public class MainApp {
         //Colors
         String green = "\u001B[32m";
         String red = "\u001B[31m";
+        String blue = "\u001B[34m";
         String reset = "\u001B[0m";
 
 
@@ -71,7 +72,7 @@ public class MainApp {
                     System.out.print("type your BirthDate: ");
                     String birthDate = sc.next();
                     System.out.print("type your BaseSalary: ");
-                    Double baseSalary = sc.nextDouble();
+                    double baseSalary = sc.nextDouble();
                     System.out.print("type your Id: ");
                     int ids = sc.nextInt();
                     Seller newSeller = new Seller(baseSalary,sdf.parse(birthDate),email,ids,name);
@@ -110,12 +111,32 @@ public class MainApp {
                              sellerDao.update(newSeller);
                              break;
                          case 5:
-                             System.out.println(green +"Type the new Department ID: "+ reset);
-                             ids = sc.nextInt();
-                             Department newDep = new Department(ids, null);
-                             newDep = (Department) sellerDao.findbyDep(newDep);
+                             Department existingDep;
+
+                             do {
+                                 System.out.println(green + "Type the new Department ID: " + reset);
+                                 ids = sc.nextInt();
+                                 sc.nextLine(); // consumir quebra de linha do nextInt()
+
+                                 Seller sellerFound = sellerDao.findById(ids);
+                                 existingDep = (sellerFound != null) ? sellerFound.getDepartment() : null;
+
+                                 if (existingDep != null && existingDep.getId() == ids) {
+                                     System.out.println(red + "Department with ID " + ids
+                                             + " already exists (" + existingDep.getName() + "). Please try again."
+                                             + reset);
+                                 }
+                             } while (existingDep != null && existingDep.getId() == ids);
+
+// Quando sair do loop, o ID é válido (não existe no banco)
+                             System.out.println(green + "Type the new Department Name: " + reset);
+                             String depName = sc.nextLine();
+
+                             Department newDep = new Department(ids, depName);
                              newSeller.setDepartment(newDep);
                              sellerDao.update(newSeller);
+
+                             System.out.println(blue + "Department updated successfully!" + reset);
                              break;
                          case 0:
                              System.out.println("leaving...");
@@ -123,6 +144,13 @@ public class MainApp {
                              break;
 
                      }
+                     break;
+
+                case 6:
+                    System.out.println(green +"Type one Id For Delete: "+ reset);
+                    id = sc.nextInt();
+                    sellerDao.deleteById(id);
+                    break;
 
                 case 0:
                     System.out.println(red + "Leaving..." + reset);
